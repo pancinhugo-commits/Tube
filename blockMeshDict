@@ -53,33 +53,54 @@ R_outer               0.2;   // Rayon extérieur [m]
 L                     1.0;   // Longueur du tube [m]
 
 // -------------------------------------------------------------------
-// Définition des points (vertices) avec calc et ::cos/::sin
+// Déclaration des expressions #calc pour les coordonnées
+// -------------------------------------------------------------------
+xInner0   #calc "$R_inner*::cos(0)";
+yInner0   #calc "$R_inner*::sin(0)";
+xInner90  #calc "$R_inner*::cos(90)";
+yInner90  #calc "$R_inner*::sin(90)";
+xInner180 #calc "$R_inner*::cos(180)";
+yInner180 #calc "$R_inner*::sin(180)";
+xInner270 #calc "$R_inner*::cos(270)";
+yInner270 #calc "$R_inner*::sin(270)";
+
+xOuter0   #calc "$R_outer*::cos(0)";
+yOuter0   #calc "$R_outer*::sin(0)";
+xOuter90  #calc "$R_outer*::cos(90)";
+yOuter90  #calc "$R_outer*::sin(90)";
+xOuter180 #calc "$R_outer*::cos(180)";
+yOuter180 #calc "$R_outer*::sin(180)";
+xOuter270 #calc "$R_outer*::cos(270)";
+yOuter270 #calc "$R_outer*::sin(270)";
+
+// -------------------------------------------------------------------
+// Définition des points (vertices)
 // -------------------------------------------------------------------
 vertices
 (
     // Points intérieurs (cercle intérieur) à z = 0
-    (calc "$R_inner*::cos(0)" calc "$R_inner*::sin(0)" 0)        // 0
-    (calc "$R_inner*::cos(90)" calc "$R_inner*::sin(90)" 0)      // 1
-    (calc "$R_inner*::cos(180)" calc "$R_inner*::sin(180)" 0)    // 2
-    (calc "$R_inner*::cos(270)" calc "$R_inner*::sin(270)" 0)    // 3
+    ($xInner0 $yInner0 0)        // 0
+    ($xInner90 $yInner90 0)      // 1
+    ($xInner180 $yInner180 0)    // 2
+    ($xInner270 $yInner270 0)    // 3
 
     // Points extérieurs (cercle extérieur) à z = 0
-    (calc "$R_outer*::cos(0)" calc "$R_outer*::sin(0)" 0)        // 4
-    (calc "$R_outer*::cos(90)" calc "$R_outer*::sin(90)" 0)      // 5
-    (calc "$R_outer*::cos(180)" calc "$R_outer*::sin(180)" 0)    // 6
-    (calc "$R_outer*::cos(270)" calc "$R_outer*::sin(270)" 0)    // 7
+    ($xOuter0 $yOuter0 0)        // 4
+    ($xOuter90 $yOuter90 0)      // 5
+    ($xOuter180 $yOuter180 0)    // 6
+    ($xOuter270 $yOuter270 0)    // 7
 
     // Points intérieurs à z = L (extrémité)
-    (calc "$R_inner*::cos(0)" calc "$R_inner*::sin(0)" calc "$L")        // 8
-    (calc "$R_inner*::cos(90)" calc "$R_inner*::sin(90)" calc "$L")      // 9
-    (calc "$R_inner*::cos(180)" calc "$R_inner*::sin(180)" calc "$L")    // 10
-    (calc "$R_inner*::cos(270)" calc "$R_inner*::sin(270)" calc "$L")    // 11
+    ($xInner0 $yInner0 $L)        // 8
+    ($xInner90 $yInner90 $L)      // 9
+    ($xInner180 $yInner180 $L)    // 10
+    ($xInner270 $yInner270 $L)    // 11
 
     // Points extérieurs à z = L (extrémité)
-    (calc "$R_outer*::cos(0)" calc "$R_outer*::sin(0)" calc "$L")        // 12
-    (calc "$R_outer*::cos(90)" calc "$R_outer*::sin(90)" calc "$L")      // 13
-    (calc "$R_outer*::cos(180)" calc "$R_outer*::sin(180)" calc "$L")    // 14
-    (calc "$R_outer*::cos(270)" calc "$R_outer*::sin(270)" calc "$L")    // 15
+    ($xOuter0 $yOuter0 $L)        // 12
+    ($xOuter90 $yOuter90 $L)      // 13
+    ($xOuter180 $yOuter180 $L)    // 14
+    ($xOuter270 $yOuter270 $L)    // 15
 );
 
 // -------------------------------------------------------------------
