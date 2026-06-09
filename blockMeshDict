@@ -24,9 +24,9 @@ License
 File
     blockMeshDict
 Description
-    Maillage d'un tube cylindrique creux (O-grid)
+    Maillage d'un tube cylindrique creux avec arcs (4 blocs)
 Author
-    Vibe Code (generé automatiquement)
+    Vibe Code
 -------------------------------------------------------------------*/
 
 FoamFile
@@ -44,7 +44,7 @@ FoamFile
 
 // Nombre de cellules dans chaque direction
 radialCells           10;    // Entre R_inner et R_outer
-circumferentialCells  20;    // Autour du tube
+circumferentialCells  8;     // Nombre de cellules par quart de cercle (4 x 8 = 32 total)
 axialCells            20;    // Le long de la longueur
 
 // Rayons et longueur
@@ -53,72 +53,57 @@ R_outer               0.2;   // Rayon extérieur [m]
 L                     1.0;   // Longueur du tube [m]
 
 // -------------------------------------------------------------------
-// Déclaration des expressions #calc pour les coordonnées
+// Déclaration des arcs pour les cercles intérieur et extérieur
 // -------------------------------------------------------------------
-xInner0   #calc "$R_inner*::cos(0)";
-yInner0   #calc "$R_inner*::sin(0)";
-xInner90  #calc "$R_inner*::cos(90)";
-yInner90  #calc "$R_inner*::sin(90)";
-xInner180 #calc "$R_inner*::cos(180)";
-yInner180 #calc "$R_inner*::sin(180)";
-xInner270 #calc "$R_inner*::cos(270)";
-yInner270 #calc "$R_inner*::sin(270)";
-
-xOuter0   #calc "$R_outer*::cos(0)";
-yOuter0   #calc "$R_outer*::sin(0)";
-xOuter90  #calc "$R_outer*::cos(90)";
-yOuter90  #calc "$R_outer*::sin(90)";
-xOuter180 #calc "$R_outer*::cos(180)";
-yOuter180 #calc "$R_outer*::sin(180)";
-xOuter270 #calc "$R_outer*::cos(270)";
-yOuter270 #calc "$R_outer*::sin(270)";
+innerArc  arc (0 0 0) (1 0 0) ($R_inner);
+outerArc  arc (0 0 0) (1 0 0) ($R_outer);
 
 // -------------------------------------------------------------------
-// Définition des points (vertices)
+// Définition des points (vertices) en utilisant les arcs
 // -------------------------------------------------------------------
 vertices
 (
     // Points intérieurs (cercle intérieur) à z = 0
-    ($xInner0 $yInner0 0)        // 0
-    ($xInner90 $yInner90 0)      // 1
-    ($xInner180 $yInner180 0)    // 2
-    ($xInner270 $yInner270 0)    // 3
+    ($innerArc 0)   // 0: 0°
+    ($innerArc 90)  // 1: 90°
+    ($innerArc 180) // 2: 180°
+    ($innerArc 270) // 3: 270°
 
     // Points extérieurs (cercle extérieur) à z = 0
-    ($xOuter0 $yOuter0 0)        // 4
-    ($xOuter90 $yOuter90 0)      // 5
-    ($xOuter180 $yOuter180 0)    // 6
-    ($xOuter270 $yOuter270 0)    // 7
+    ($outerArc 0)   // 4: 0°
+    ($outerArc 90)  // 5: 90°
+    ($outerArc 180) // 6: 180°
+    ($outerArc 270) // 7: 270°
 
     // Points intérieurs à z = L (extrémité)
-    ($xInner0 $yInner0 $L)        // 8
-    ($xInner90 $yInner90 $L)      // 9
-    ($xInner180 $yInner180 $L)    // 10
-    ($xInner270 $yInner270 $L)    // 11
+    ($innerArc 0  $L)   // 8: 0°
+    ($innerArc 90  $L)  // 9: 90°
+    ($innerArc 180 $L) // 10: 180°
+    ($innerArc 270 $L) // 11: 270°
 
     // Points extérieurs à z = L (extrémité)
-    ($xOuter0 $yOuter0 $L)        // 12
-    ($xOuter90 $yOuter90 $L)      // 13
-    ($xOuter180 $yOuter180 $L)    // 14
-    ($xOuter270 $yOuter270 $L)    // 15
+    ($outerArc 0  $L)   // 12: 0°
+    ($outerArc 90  $L)  // 13: 90°
+    ($outerArc 180 $L) // 14: 180°
+    ($outerArc 270 $L) // 15: 270°
 );
 
 // -------------------------------------------------------------------
-// Définition des blocs (hexahédriques)
+// Définition des blocs (hexahédriques) - 4 blocs pour les 4 quarts
 // -------------------------------------------------------------------
 blocks
 (
-    // Bloc 1 : Quart de tube (0-90 degrés)
-    hex (0 1 9 8 4 5 13 12) (radialCells circumferentialCells/4 axialCells) simpleGrading (1 1 1)
+    // Bloc 1 : Quart de tube (0°-90°)
+    hex (0 1 9 8 4 5 13 12) (radialCells circumferentialCells axialCells) simpleGrading (1 1 1)
 
-    // Bloc 2 : Quart de tube (90-180 degrés)
-    hex (1 2 10 9 5 6 14 13) (radialCells circumferentialCells/4 axialCells) simpleGrading (1 1 1)
+    // Bloc 2 : Quart de tube (90°-180°)
+    hex (1 2 10 9 5 6 14 13) (radialCells circumferentialCells axialCells) simpleGrading (1 1 1)
 
-    // Bloc 3 : Quart de tube (180-270 degrés)
-    hex (2 3 11 10 6 7 15 14) (radialCells circumferentialCells/4 axialCells) simpleGrading (1 1 1)
+    // Bloc 3 : Quart de tube (180°-270°)
+    hex (2 3 11 10 6 7 15 14) (radialCells circumferentialCells axialCells) simpleGrading (1 1 1)
 
-    // Bloc 4 : Quart de tube (270-360 degrés)
-    hex (3 0 8 11 7 4 12 15) (radialCells circumferentialCells/4 axialCells) simpleGrading (1 1 1)
+    // Bloc 4 : Quart de tube (270°-360°)
+    hex (3 0 8 11 7 4 12 15) (radialCells circumferentialCells axialCells) simpleGrading (1 1 1)
 );
 
 // -------------------------------------------------------------------
@@ -129,7 +114,7 @@ boundary
     // Paroi intérieure du tube
     innerWall
     {
-        type            patch;
+        type    patch;
         faces
         (
             (0 1 9 8)
@@ -142,7 +127,7 @@ boundary
     // Paroi extérieure du tube
     outerWall
     {
-        type            patch;
+        type    patch;
         faces
         (
             (4 5 13 12)
@@ -155,7 +140,7 @@ boundary
     // Entrée du tube (z = 0)
     inlet
     {
-        type            patch;
+        type    patch;
         faces
         (
             (0 4 5 1)
@@ -168,7 +153,7 @@ boundary
     // Sortie du tube (z = L)
     outlet
     {
-        type            patch;
+        type    patch;
         faces
         (
             (8 12 13 9)
@@ -178,25 +163,16 @@ boundary
         );
     }
 
-    // Frontière par défaut (pour les faces restantes)
+    // Frontière par défaut
     defaultFaces
     {
-        type            empty;
-        faces
-        (
-        );
+        type    empty;
+        faces   ();
     }
 );
 
 // -------------------------------------------------------------------
-// Définition des edges (grading personnalisé si nécessaire)
-// -------------------------------------------------------------------
-edges
-(
-);
-
-// -------------------------------------------------------------------
-// Merge des points (pour éviter les doublons)
+// Merge des points pour éviter les doublons
 // -------------------------------------------------------------------
 mergePatchPairs
 (
