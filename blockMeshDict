@@ -1,0 +1,182 @@
+/*--------------------------------*- C++ -*----------------------------------*
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
+     \/     M anipulation  |
+-------------------------------------------------------------------
+License
+    This file is part of OpenFOAM.
+
+    OpenFOAM is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+
+File
+    blockMeshDict
+Description
+    Maillage d'un tube cylindrique creux (O-grid)
+Author
+    Vibe Code (generé automatiquement)
+-------------------------------------------------------------------*/
+
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      blockMeshDict;
+}
+
+// -------------------------------------------------------------------
+// Configuration du maillage
+// -------------------------------------------------------------------
+
+// Nombre de cellules dans chaque direction
+radialCells           10;    // Entre R_inner et R_outer
+circumferentialCells  20;    // Autour du tube
+axialCells            20;    // Le long de la longueur
+
+// Rayons et longueur
+R_inner               0.1;   // Rayon intérieur [m]
+R_outer               0.2;   // Rayon extérieur [m]
+L                     1.0;   // Longueur du tube [m]
+
+// -------------------------------------------------------------------
+// Définition des points (vertices)
+// -------------------------------------------------------------------
+vertices
+(
+    // Points intérieurs (cercle intérieur) à z = 0
+    ( $(R_inner*cos(0)) $(R_inner*sin(0)) 0 )        // 0
+    ( $(R_inner*cos(90)) $(R_inner*sin(90)) 0 )      // 1
+    ( $(R_inner*cos(180)) $(R_inner*sin(180)) 0 )    // 2
+    ( $(R_inner*cos(270)) $(R_inner*sin(270)) 0 )    // 3
+
+    // Points extérieurs (cercle extérieur) à z = 0
+    ( $(R_outer*cos(0)) $(R_outer*sin(0)) 0 )        // 4
+    ( $(R_outer*cos(90)) $(R_outer*sin(90)) 0 )      // 5
+    ( $(R_outer*cos(180)) $(R_outer*sin(180)) 0 )    // 6
+    ( $(R_outer*cos(270)) $(R_outer*sin(270)) 0 )    // 7
+
+    // Points intérieurs à z = L (extrémité)
+    ( $(R_inner*cos(0)) $(R_inner*sin(0)) L )        // 8
+    ( $(R_inner*cos(90)) $(R_inner*sin(90)) L )      // 9
+    ( $(R_inner*cos(180)) $(R_inner*sin(180)) L )    // 10
+    ( $(R_inner*cos(270)) $(R_inner*sin(270)) L )    // 11
+
+    // Points extérieurs à z = L (extrémité)
+    ( $(R_outer*cos(0)) $(R_outer*sin(0)) L )        // 12
+    ( $(R_outer*cos(90)) $(R_outer*sin(90)) L )      // 13
+    ( $(R_outer*cos(180)) $(R_outer*sin(180)) L )    // 14
+    ( $(R_outer*cos(270)) $(R_outer*sin(270)) L )    // 15
+);
+
+// -------------------------------------------------------------------
+// Définition des blocs (hexahédriques)
+// -------------------------------------------------------------------
+blocks
+(
+    // Bloc 1 : Quart de tube (0-90 degrés)
+    hex (0 1 9 8 4 5 13 12) (radialCells circumferentialCells/4 axialCells) simpleGrading (1 1 1)
+
+    // Bloc 2 : Quart de tube (90-180 degrés)
+    hex (1 2 10 9 5 6 14 13) (radialCells circumferentialCells/4 axialCells) simpleGrading (1 1 1)
+
+    // Bloc 3 : Quart de tube (180-270 degrés)
+    hex (2 3 11 10 6 7 15 14) (radialCells circumferentialCells/4 axialCells) simpleGrading (1 1 1)
+
+    // Bloc 4 : Quart de tube (270-360 degrés)
+    hex (3 0 8 11 7 4 12 15) (radialCells circumferentialCells/4 axialCells) simpleGrading (1 1 1)
+);
+
+// -------------------------------------------------------------------
+// Définition des patches (frontières)
+// -------------------------------------------------------------------
+boundary
+(
+    // Paroi intérieure du tube
+    innerWall
+    {
+        type            patch;
+        faces
+        (
+            (0 1 9 8)
+            (1 2 10 9)
+            (2 3 11 10)
+            (3 0 8 11)
+        );
+    }
+
+    // Paroi extérieure du tube
+    outerWall
+    {
+        type            patch;
+        faces
+        (
+            (4 5 13 12)
+            (5 6 14 13)
+            (6 7 15 14)
+            (7 4 12 15)
+        );
+    }
+
+    // Entrée du tube (z = 0)
+    inlet
+    {
+        type            patch;
+        faces
+        (
+            (0 4 5 1)
+            (1 5 6 2)
+            (2 6 7 3)
+            (3 7 4 0)
+        );
+    }
+
+    // Sortie du tube (z = L)
+    outlet
+    {
+        type            patch;
+        faces
+        (
+            (8 12 13 9)
+            (9 13 14 10)
+            (10 14 15 11)
+            (11 15 12 8)
+        );
+    }
+
+    // Frontière par défaut (pour les faces restantes)
+    defaultFaces
+    {
+        type            empty;
+        faces
+        (
+        );
+    }
+);
+
+// -------------------------------------------------------------------
+// Définition des edges (grading personnalisé si nécessaire)
+// -------------------------------------------------------------------
+edges
+(
+);
+
+// -------------------------------------------------------------------
+// Merge des points (pour éviter les doublons)
+// -------------------------------------------------------------------
+mergePatchPairs
+(
+);
