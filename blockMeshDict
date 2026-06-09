@@ -1,207 +1,101 @@
-/*--------------------------------*- C++ -*----------------------------------*
-  =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
-     \/     M anipulation  |
--------------------------------------------------------------------
-License
-    This file is part of OpenFOAM.
-
-    OpenFOAM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
-
-File
-    blockMeshDict
-Description
-    Maillage d'un tube cylindrique creux avec arcs dans edges
-Author
-    Vibe Code
--------------------------------------------------------------------*/
-
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2212                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
 FoamFile
 {
     version     2.0;
     format      ascii;
     class       dictionary;
-    location    "system";
     object      blockMeshDict;
 }
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// -------------------------------------------------------------------
-// Configuration du maillage
-// -------------------------------------------------------------------
+scale 0.01;
 
-// Nombre de cellules dans chaque direction
-radialCells           10;    // Entre R_inner et R_outer
-circumferentialCells  8;     // Nombre de cellules par quart de cercle
-axialCells            20;    // Le long de la longueur
+// radius of injector
+r1 10;
+// radius of first refinement zone
+r2 11;
+// Lenght of domain
+L 80;
 
-// Rayons et longueur
-R_inner               0.1;   // Rayon intérieur [m]
-R_outer               0.2;   // Rayon extérieur [m]
-L                     1.0;   // Longueur du tube [m]
+l1 #calc "($r1*cos(45*3.14/180))";
+l2 #calc "($r2*cos(45*3.14/180))";
+l1m #calc "-$l1";
+l2m #calc "-$l2";
+r1m #calc "-$r1";
+r2m #calc "-$r2";
 
-// Pré-calcul des valeurs négatives
-R_inner_neg           #calc "-$R_inner";
-R_outer_neg           #calc "-$R_outer";
 
-// -------------------------------------------------------------------
-// Définition des points (vertices) - 16 points pour 4 quarts
-// -------------------------------------------------------------------
+// number of vortices in x and y directions
+nxy 10;
+// number of vorticies in z direction
+nz 10;
+
 vertices
 (
-    // Points intérieurs (cercle intérieur) à z = 0
-    ($R_inner 0 0)          // 0: 0°
-    (0 $R_inner 0)          // 1: 90°
-    ($R_inner_neg 0 0)      // 2: 180°
-    (0 $R_inner_neg 0)      // 3: 270°
-
-    // Points extérieurs (cercle extérieur) à z = 0
-    ($R_outer 0 0)          // 4: 0°
-    (0 $R_outer 0)          // 5: 90°
-    ($R_outer_neg 0 0)      // 6: 180°
-    (0 $R_outer_neg 0)      // 7: 270°
-
-    // Points intérieurs à z = L (extrémité)
-    ($R_inner 0 $L)         // 8: 0°
-    (0 $R_inner $L)         // 9: 90°
-    ($R_inner_neg 0 $L)     // 10: 180°
-    (0 $R_inner_neg $L)     // 11: 270°
-
-    // Points extérieurs à z = L (extrémité)
-    ($R_outer 0 $L)         // 12: 0°
-    (0 $R_outer $L)         // 13: 90°
-    ($R_outer_neg 0 $L)     // 14: 180°
-    (0 $R_outer_neg $L)     // 15: 270°
+    ($l1 $l1 0)	        // vertex 0
+    ($l1m $l1 0)	// vertex 1
+    ($l1m $l1m 0)	// vertex 2
+    ($l1 $l1m 0)	// vertex 3
+    ($l2 $l2 0)	        // vertex 4
+    ($l2m $l2 0)	// vertex 5
+    ($l2m $l2m 0)	// vertex 6
+    ($l2 $l2m 0)	// vertex 7
+    ($l1 $l1 $L)	// vertex 8
+    ($l1m $l1 $L)	// vertex 9
+    ($l1m $l1m $L)      // vertex 10
+    ($l1 $l1m $L)	// vertex 11
+    ($l2 $l2 $L)	// vertex 12
+    ($l2m $l2 $L)	// vertex 13
+    ($l2m $l2m $L)      // vertex 14
+    ($l2 $l2m $L)	// vertex 15
+    
 );
 
-// -------------------------------------------------------------------
-// Définition des blocs (hexahédriques) - 4 blocs pour les 4 quarts
-// -------------------------------------------------------------------
 blocks
 (
-    // Bloc 1 : Quart de tube (0°-90°)
-    hex (0 1 9 8 4 5 13 12) (radialCells circumferentialCells axialCells) simpleGrading (1 1 1)
-
-    // Bloc 2 : Quart de tube (90°-180°)
-    hex (1 2 10 9 5 6 14 13) (radialCells circumferentialCells axialCells) simpleGrading (1 1 1)
-
-    // Bloc 3 : Quart de tube (180°-270°)
-    hex (2 3 11 10 6 7 15 14) (radialCells circumferentialCells axialCells) simpleGrading (1 1 1)
-
-    // Bloc 4 : Quart de tube (270°-360°)
-    hex (3 0 8 11 7 4 12 15) (radialCells circumferentialCells axialCells) simpleGrading (1 1 1)
+     hex (0 4 5 1 8 12 13 9) ($nxy $nxy $nz) simpleGrading (1 1 1)	// block 1
+    hex (1 5 6 2 9 13 14 10) ($nxy $nxy $nz) simpleGrading (1 1 1)	// block 2
+    hex (2 6 7 3 10 14 15 11) ($nxy $nxy $nz) simpleGrading (1 1 1)	// block 3
+    hex (7 4 0 3 15 12 8 11) ($nxy $nxy $nz) simpleGrading (1 1 1)	// block 4
 );
 
-// -------------------------------------------------------------------
-// Définition des arcs dans edges
-// -------------------------------------------------------------------
 edges
-(
-    // Arcs pour le cercle intérieur à z = 0 (sens anti-horaire)
-    arc 0 1 (0 0 0)         // Arc de 0° à 90°
-    arc 1 2 (0 0 0)         // Arc de 90° à 180°
-    arc 2 3 (0 0 0)         // Arc de 180° à 270°
-    arc 3 0 (0 0 0)         // Arc de 270° à 0° (fermeture du cercle)
+( 
 
-    // Arcs pour le cercle extérieur à z = 0 (sens anti-horaire)
-    arc 4 5 (0 0 0)         // Arc de 0° à 90°
-    arc 5 6 (0 0 0)         // Arc de 90° à 180°
-    arc 6 7 (0 0 0)         // Arc de 180° à 270°
-    arc 7 4 (0 0 0)         // Arc de 270° à 0° (fermeture du cercle)
+    arc 4 5 (0 $r2 0)		// edge 1
+    arc 5 6 ($r2m 0 0)		// edge 2
+    arc 6 7 (0 $r2m 0)		// edge 3
+    arc 7 4 ($r2 0 0)		// edge 4
+    arc 0 1 (0 $r1 0)	        // edge 5
+    arc 1 2 ($r1m 0 0)	        // edge 6
+    arc 2 3 (0 $r1m 0)	        // edge 7
+    arc 3 0 ($r1 0 0)	        // edge 8
 
-    // Arcs pour le cercle intérieur à z = L (sens anti-horaire)
-    arc 8 9 (0 0 $L)        // Arc de 0° à 90°
-    arc 9 10 (0 0 $L)       // Arc de 90° à 180°
-    arc 10 11 (0 0 $L)      // Arc de 180° à 270°
-    arc 11 8 (0 0 $L)       // Arc de 270° à 0° (fermeture du cercle)
 
-    // Arcs pour le cercle extérieur à z = L (sens anti-horaire)
-    arc 12 13 (0 0 $L)      // Arc de 0° à 90°
-    arc 13 14 (0 0 $L)      // Arc de 90° à 180°
-    arc 14 15 (0 0 $L)      // Arc de 180° à 270°
-    arc 15 12 (0 0 $L)      // Arc de 270° à 0° (fermeture du cercle)
+    arc 12 13 (0 $r2 $L)	// edge 9
+    arc 13 14 ($r2m 0 $L)	// edge 10
+    arc 14 15 (0 $r2m $L)	// edge 11
+    arc 15 12 ($r2 0 $L)	// edge 12
+    arc 8 9 (0 $r1 $L)	        // edge 13
+    arc 9 10 ($r1m 0 $L)	// edge 14
+    arc 10 11 (0 $r1m $L)	// edge 15
+    arc 11 8 ($r1 0 $L)	        // edge 16 
+    
 );
 
-// -------------------------------------------------------------------
-// Définition des patches (frontières)
-// -------------------------------------------------------------------
 boundary
-(
-    // Paroi intérieure du tube
-    innerWall
-    {
-        type    patch;
-        faces
-        (
-            (0 1 9 8)
-            (1 2 10 9)
-            (2 3 11 10)
-            (3 0 8 11)
-        );
-    }
+( 
 
-    // Paroi extérieure du tube
-    outerWall
-    {
-        type    patch;
-        faces
-        (
-            (4 5 13 12)
-            (5 6 14 13)
-            (6 7 15 14)
-            (7 4 12 15)
-        );
-    }
-
-    // Entrée du tube (z = 0)
-    inlet
-    {
-        type    patch;
-        faces
-        (
-            (0 4 5 1)
-            (1 5 6 2)
-            (2 6 7 3)
-            (3 7 4 0)
-        );
-    }
-
-    // Sortie du tube (z = L)
-    outlet
-    {
-        type    patch;
-        faces
-        (
-            (8 12 13 9)
-            (9 13 14 10)
-            (10 14 15 11)
-            (11 15 12 8)
-        );
-    }
-
-    // Frontière par défaut
-    defaultFaces
-    {
-        type    empty;
-        faces   ();
-    }
 );
 
-// -------------------------------------------------------------------
-// Merge des points pour éviter les doublons
-// -------------------------------------------------------------------
 mergePatchPairs
 (
 );
+
+// ************************************************************************* //
