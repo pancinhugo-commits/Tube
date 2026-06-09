@@ -24,7 +24,7 @@ License
 File
     blockMeshDict
 Description
-    Maillage d'un tube cylindrique creux avec arcs (4 blocs)
+    Maillage d'un tube cylindrique creux avec arcs dans edges
 Author
     Vibe Code
 -------------------------------------------------------------------*/
@@ -44,7 +44,7 @@ FoamFile
 
 // Nombre de cellules dans chaque direction
 radialCells           10;    // Entre R_inner et R_outer
-circumferentialCells  8;     // Nombre de cellules par quart de cercle (4 x 8 = 32 total)
+circumferentialCells  8;     // Nombre de cellules par quart de cercle
 axialCells            20;    // Le long de la longueur
 
 // Rayons et longueur
@@ -53,39 +53,33 @@ R_outer               0.2;   // Rayon extérieur [m]
 L                     1.0;   // Longueur du tube [m]
 
 // -------------------------------------------------------------------
-// Déclaration des arcs pour les cercles intérieur et extérieur
-// -------------------------------------------------------------------
-innerArc  arc (0 0 0) (1 0 0) ($R_inner);
-outerArc  arc (0 0 0) (1 0 0) ($R_outer);
-
-// -------------------------------------------------------------------
-// Définition des points (vertices) en utilisant les arcs
+// Définition des points (vertices) - 16 points pour 4 quarts
 // -------------------------------------------------------------------
 vertices
 (
     // Points intérieurs (cercle intérieur) à z = 0
-    ($innerArc 0)   // 0: 0°
-    ($innerArc 90)  // 1: 90°
-    ($innerArc 180) // 2: 180°
-    ($innerArc 270) // 3: 270°
+    ($R_inner 0 0)          // 0: 0°
+    (0 $R_inner 0)          // 1: 90°
+    ($R_inner*(-1) 0 0)     // 2: 180°
+    (0 $R_inner*(-1) 0)     // 3: 270°
 
     // Points extérieurs (cercle extérieur) à z = 0
-    ($outerArc 0)   // 4: 0°
-    ($outerArc 90)  // 5: 90°
-    ($outerArc 180) // 6: 180°
-    ($outerArc 270) // 7: 270°
+    ($R_outer 0 0)          // 4: 0°
+    (0 $R_outer 0)          // 5: 90°
+    ($R_outer*(-1) 0 0)     // 6: 180°
+    (0 $R_outer*(-1) 0)     // 7: 270°
 
     // Points intérieurs à z = L (extrémité)
-    ($innerArc 0  $L)   // 8: 0°
-    ($innerArc 90  $L)  // 9: 90°
-    ($innerArc 180 $L) // 10: 180°
-    ($innerArc 270 $L) // 11: 270°
+    ($R_inner 0 $L)         // 8: 0°
+    (0 $R_inner $L)         // 9: 90°
+    ($R_inner*(-1) 0 $L)    // 10: 180°
+    (0 $R_inner*(-1) $L)    // 11: 270°
 
     // Points extérieurs à z = L (extrémité)
-    ($outerArc 0  $L)   // 12: 0°
-    ($outerArc 90  $L)  // 13: 90°
-    ($outerArc 180 $L) // 14: 180°
-    ($outerArc 270 $L) // 15: 270°
+    ($R_outer 0 $L)         // 12: 0°
+    (0 $R_outer $L)         // 13: 90°
+    ($R_outer*(-1) 0 $L)    // 14: 180°
+    (0 $R_outer*(-1) $L)    // 15: 270°
 );
 
 // -------------------------------------------------------------------
@@ -104,6 +98,36 @@ blocks
 
     // Bloc 4 : Quart de tube (270°-360°)
     hex (3 0 8 11 7 4 12 15) (radialCells circumferentialCells axialCells) simpleGrading (1 1 1)
+);
+
+// -------------------------------------------------------------------
+// Définition des arcs dans edges
+// -------------------------------------------------------------------
+edges
+(
+    // Arcs pour le cercle intérieur à z = 0
+    arc 0 1 (0 0 0)         // Arc de 0° à 90° (cercle intérieur, z=0)
+    arc 1 2 (0 0 0)         // Arc de 90° à 180° (cercle intérieur, z=0)
+    arc 2 3 (0 0 0)         // Arc de 180° à 270° (cercle intérieur, z=0)
+    arc 3 0 (0 0 0)         // Arc de 270° à 360° (cercle intérieur, z=0)
+
+    // Arcs pour le cercle extérieur à z = 0
+    arc 4 5 (0 0 0)         // Arc de 0° à 90° (cercle extérieur, z=0)
+    arc 5 6 (0 0 0)         // Arc de 90° à 180° (cercle extérieur, z=0)
+    arc 6 7 (0 0 0)         // Arc de 180° à 270° (cercle extérieur, z=0)
+    arc 7 4 (0 0 0)         // Arc de 270° à 360° (cercle extérieur, z=0)
+
+    // Arcs pour le cercle intérieur à z = L
+    arc 8 9 (0 0 $L)        // Arc de 0° à 90° (cercle intérieur, z=L)
+    arc 9 10 (0 0 $L)       // Arc de 90° à 180° (cercle intérieur, z=L)
+    arc 10 11 (0 0 $L)      // Arc de 180° à 270° (cercle intérieur, z=L)
+    arc 11 8 (0 0 $L)       // Arc de 270° à 360° (cercle intérieur, z=L)
+
+    // Arcs pour le cercle extérieur à z = L
+    arc 12 13 (0 0 $L)      // Arc de 0° à 90° (cercle extérieur, z=L)
+    arc 13 14 (0 0 $L)      // Arc de 90° à 180° (cercle extérieur, z=L)
+    arc 14 15 (0 0 $L)      // Arc de 180° à 270° (cercle extérieur, z=L)
+    arc 15 12 (0 0 $L)      // Arc de 270° à 360° (cercle extérieur, z=L)
 );
 
 // -------------------------------------------------------------------
