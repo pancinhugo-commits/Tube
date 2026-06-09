@@ -53,33 +53,33 @@ R_outer               0.2;   // Rayon extérieur [m]
 L                     1.0;   // Longueur du tube [m]
 
 // -------------------------------------------------------------------
-// Définition des points (vertices)
+// Définition des points (vertices) avec #calc
 // -------------------------------------------------------------------
 vertices
 (
     // Points intérieurs (cercle intérieur) à z = 0
-    ( $(R_inner*cos(0)) $(R_inner*sin(0)) 0 )        // 0
-    ( $(R_inner*cos(90)) $(R_inner*sin(90)) 0 )      // 1
-    ( $(R_inner*cos(180)) $(R_inner*sin(180)) 0 )    // 2
-    ( $(R_inner*cos(270)) $(R_inner*sin(270)) 0 )    // 3
+    (#calc "vector($R_inner*cos(0), $R_inner*sin(0), 0)" )        // 0
+    (#calc "vector($R_inner*cos(90), $R_inner*sin(90), 0)" )      // 1
+    (#calc "vector($R_inner*cos(180), $R_inner*sin(180), 0)" )    // 2
+    (#calc "vector($R_inner*cos(270), $R_inner*sin(270), 0)" )    // 3
 
     // Points extérieurs (cercle extérieur) à z = 0
-    ( $(R_outer*cos(0)) $(R_outer*sin(0)) 0 )        // 4
-    ( $(R_outer*cos(90)) $(R_outer*sin(90)) 0 )      // 5
-    ( $(R_outer*cos(180)) $(R_outer*sin(180)) 0 )    // 6
-    ( $(R_outer*cos(270)) $(R_outer*sin(270)) 0 )    // 7
+    (#calc "vector($R_outer*cos(0), $R_outer*sin(0), 0)" )        // 4
+    (#calc "vector($R_outer*cos(90), $R_outer*sin(90), 0)" )      // 5
+    (#calc "vector($R_outer*cos(180), $R_outer*sin(180), 0)" )    // 6
+    (#calc "vector($R_outer*cos(270), $R_outer*sin(270), 0)" )    // 7
 
     // Points intérieurs à z = L (extrémité)
-    ( $(R_inner*cos(0)) $(R_inner*sin(0)) L )        // 8
-    ( $(R_inner*cos(90)) $(R_inner*sin(90)) L )      // 9
-    ( $(R_inner*cos(180)) $(R_inner*sin(180)) L )    // 10
-    ( $(R_inner*cos(270)) $(R_inner*sin(270)) L )    // 11
+    (#calc "vector($R_inner*cos(0), $R_inner*sin(0), $L)" )        // 8
+    (#calc "vector($R_inner*cos(90), $R_inner*sin(90), $L)" )      // 9
+    (#calc "vector($R_inner*cos(180), $R_inner*sin(180), $L)" )    // 10
+    (#calc "vector($R_inner*cos(270), $R_inner*sin(270), $L)" )    // 11
 
     // Points extérieurs à z = L (extrémité)
-    ( $(R_outer*cos(0)) $(R_outer*sin(0)) L )        // 12
-    ( $(R_outer*cos(90)) $(R_outer*sin(90)) L )      // 13
-    ( $(R_outer*cos(180)) $(R_outer*sin(180)) L )    // 14
-    ( $(R_outer*cos(270)) $(R_outer*sin(270)) L )    // 15
+    (#calc "vector($R_outer*cos(0), $R_outer*sin(0), $L)" )        // 12
+    (#calc "vector($R_outer*cos(90), $R_outer*sin(90), $L)" )      // 13
+    (#calc "vector($R_outer*cos(180), $R_outer*sin(180), $L)" )    // 14
+    (#calc "vector($R_outer*cos(270), $R_outer*sin(270), $L)" )    // 15
 );
 
 // -------------------------------------------------------------------
