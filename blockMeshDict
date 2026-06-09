@@ -44,7 +44,6 @@ FoamFile
 
 // Nombre de cellules dans chaque direction
 radialCells           10;    // Entre R_inner et R_outer
-circumferentialCells  8;     // Nombre de cellules par quart de cercle
 axialCells            20;    // Le long de la longueur
 
 // Rayons et longueur
@@ -92,23 +91,24 @@ vertices
 blocks
 (
     // Bloc 1 : Quart de tube (0°-90°)
-    hex (0 1 9 8 4 5 13 12) (radialCells circumferentialCells axialCells) simpleGrading (1 1 1)
+    hex (0 1 9 8 4 5 13 12) ($radialCells $radialCells $axialCells) simpleGrading (1 1 1)
 
     // Bloc 2 : Quart de tube (90°-180°)
-    hex (1 2 10 9 5 6 14 13) (radialCells circumferentialCells axialCells) simpleGrading (1 1 1)
+    hex (1 2 10 9 5 6 14 13) ($radialCells $radialCells $axialCells) simpleGrading (1 1 1)
 
     // Bloc 3 : Quart de tube (180°-270°)
-    hex (2 3 11 10 6 7 15 14) (radialCells circumferentialCells axialCells) simpleGrading (1 1 1)
+    hex (2 3 11 10 6 7 15 14) ($radialCells $radialCells $axialCells) simpleGrading (1 1 1)
 
     // Bloc 4 : Quart de tube (270°-360°)
-    hex (3 0 8 11 7 4 12 15) (radialCells circumferentialCells axialCells) simpleGrading (1 1 1)
+    hex (3 0 8 11 7 4 12 15) ($radialCells $radialCells $axialCells) simpleGrading (1 1 1) 
+
 );
 
 // -------------------------------------------------------------------
 // Définition des arcs dans edges
 // -------------------------------------------------------------------
 edges
-(
+( 
     // Arcs pour le cercle intérieur à z = 0
     arc 0 1 (0 0 0)         // Arc de 0° à 90° (cercle intérieur, z=0)
     arc 1 2 (0 0 0)         // Arc de 90° à 180° (cercle intérieur, z=0)
@@ -131,14 +131,15 @@ edges
     arc 12 13 (0 0 $L)      // Arc de 0° à 90° (cercle extérieur, z=L)
     arc 13 14 (0 0 $L)      // Arc de 90° à 180° (cercle extérieur, z=L)
     arc 14 15 (0 0 $L)      // Arc de 180° à 270° (cercle extérieur, z=L)
-    arc 15 12 (0 0 $L)      // Arc de 270° à 360° (cercle extérieur, z=L)
+    arc 15 12 (0 0 $L)      // Arc de 270° à 360° (cercle extérieur, z=L) 
+
 );
 
 // -------------------------------------------------------------------
 // Définition des patches (frontières)
 // -------------------------------------------------------------------
 boundary
-(
+( 
     // Paroi intérieure du tube
     innerWall
     {
@@ -196,7 +197,8 @@ boundary
     {
         type    empty;
         faces   ();
-    }
+    } 
+
 );
 
 // -------------------------------------------------------------------
