@@ -52,6 +52,10 @@ R_inner               0.1;   // Rayon intérieur [m]
 R_outer               0.2;   // Rayon extérieur [m]
 L                     1.0;   // Longueur du tube [m]
 
+// Pré-calcul des valeurs négatives
+R_inner_neg           #calc "-$R_inner";
+R_outer_neg           #calc "-$R_outer";
+
 // -------------------------------------------------------------------
 // Définition des points (vertices) - 16 points pour 4 quarts
 // -------------------------------------------------------------------
@@ -60,26 +64,26 @@ vertices
     // Points intérieurs (cercle intérieur) à z = 0
     ($R_inner 0 0)          // 0: 0°
     (0 $R_inner 0)          // 1: 90°
-    ($R_inner*(-1) 0 0)     // 2: 180°
-    (0 $R_inner*(-1) 0)     // 3: 270°
+    ($R_inner_neg 0 0)      // 2: 180°
+    (0 $R_inner_neg 0)      // 3: 270°
 
     // Points extérieurs (cercle extérieur) à z = 0
     ($R_outer 0 0)          // 4: 0°
     (0 $R_outer 0)          // 5: 90°
-    ($R_outer*(-1) 0 0)     // 6: 180°
-    (0 $R_outer*(-1) 0)     // 7: 270°
+    ($R_outer_neg 0 0)      // 6: 180°
+    (0 $R_outer_neg 0)      // 7: 270°
 
     // Points intérieurs à z = L (extrémité)
     ($R_inner 0 $L)         // 8: 0°
     (0 $R_inner $L)         // 9: 90°
-    ($R_inner*(-1) 0 $L)    // 10: 180°
-    (0 $R_inner*(-1) $L)    // 11: 270°
+    ($R_inner_neg 0 $L)     // 10: 180°
+    (0 $R_inner_neg $L)     // 11: 270°
 
     // Points extérieurs à z = L (extrémité)
     ($R_outer 0 $L)         // 12: 0°
     (0 $R_outer $L)         // 13: 90°
-    ($R_outer*(-1) 0 $L)    // 14: 180°
-    (0 $R_outer*(-1) $L)    // 15: 270°
+    ($R_outer_neg 0 $L)     // 14: 180°
+    (0 $R_outer_neg $L)     // 15: 270°
 );
 
 // -------------------------------------------------------------------
